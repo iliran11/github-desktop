@@ -20,15 +20,18 @@ if [ ! -d node_modules ] || [ package-lock.json -nt node_modules ]; then
   npm ci
 fi
 
-npm run build:dev
+# build:dev loads its UI from a webpack dev server, so it can't run standalone.
+# A production bundle on the development channel is self-contained, ad-hoc
+# signed, and has auto-update disabled.
+RELEASE_CHANNEL=development npm run build:prod
 
-APP_NAME="GitHub Desktop-dev.app"
+APP_NAME="GitHub Desktop.app"
 ARCH="$(uname -m)"
 [ "$ARCH" = "x86_64" ] && ARCH="x64"
-BUILT_APP="$REPO_ROOT/dist/GitHub Desktop-dev-darwin-$ARCH/$APP_NAME"
+BUILT_APP="$REPO_ROOT/dist/GitHub Desktop-darwin-$ARCH/$APP_NAME"
 INSTALLED_APP="/Applications/$APP_NAME"
 
-osascript -e 'quit app "GitHub Desktop-dev"' 2>/dev/null || true
+osascript -e 'quit app "GitHub Desktop"' 2>/dev/null || true
 sleep 1
 rm -rf "$INSTALLED_APP"
 ditto "$BUILT_APP" "$INSTALLED_APP"
